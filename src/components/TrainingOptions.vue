@@ -27,7 +27,7 @@
             class="form-check-input"
             id="up"
             aria-describedby="ascending interval"
-            v-model="direction.up"
+            v-model="directions.up"
           />
           <label class="form-check-label" for="up">ascending</label>
         </div>
@@ -38,27 +38,27 @@
           <input
             type="checkbox"
             class="form-check-input"
+            id="down"
+            aria-describedby="descending interval"
+            v-model="directions.down"
+          />
+          <label class="form-check-label" for="down">descending</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="col-sm-4">
+        <div class="form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
             id="together"
             aria-describedby="harmonic interval"
             v-model="direction.together"
           />
           <label class="form-check-label" for="together">harmonic</label>
         </div>
-      </div>
-
-      <div class="col-sm-4">
-        <div class="form-check">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            id="down"
-            aria-describedby="descending interval"
-            v-model="direction.down"
-          />
-          <label class="form-check-label" for="down">descending</label>
-        </div>
-      </div>
-    </div>
+      </div> -->
 
     <div class="row">
       <div class="col-sm-8">
@@ -101,7 +101,7 @@ export default {
     return {
       INTERVALS,
       selected: {},
-      direction: { up: false, down: false, together: false },
+      directions: { up: false, down: false },
       nQuestions: 10,
     };
   },
@@ -109,23 +109,26 @@ export default {
     configs() {
       const intervals = [];
       const directions = [];
-      const range = ["A2, E5"]; // TODO implement range selection
+      const range = ["A2", "E5"]; // TODO implement range selection
       // for (let i in this.selected) this.selected[i] && intervals.push(i);
       for (let i of this.INTERVALS) this.selected[i.label] && intervals.push(i);
-      for (let d in this.direction) this.direction[d] && directions.push(d);
+      // for (let d in this.directions) this.directions[d] && directions.push(d);
+      if (this.directions.up) directions.push(+1);
+      if (this.directions.down) directions.push(-1);
+
       return { intervals, directions, nQuestions: this.nQuestions, range };
     },
   },
   mounted() {
     this.setDefaults();
-    this.$emit("training-settings", this.configs); // !DEBUG
+    // this.$emit("training-settings", this.configs); // !DEBUG
   },
   methods: {
     setDefaults() {
       const intervals = ["M2", "m3", "M3", "P5", "P8"];
       const directions = ["up", "down"];
       for (let i of intervals) this.selected[i] = true;
-      for (let d of directions) this.direction[d] = true;
+      for (let d of directions) this.directions[d] = true;
     },
   },
 };

@@ -8,8 +8,13 @@
       v-if="stage === 'questions'"
       :settings="settings"
       @reset="reset"
+      @training-done="submit"
     />
-    <training-congrats v-if="stage === 'congrats'" />
+    <training-congrats
+      v-if="stage === 'congrats'"
+      @reset="reset"
+      @restart="restart"
+    />
   </div>
 </template>
 
@@ -26,13 +31,20 @@ export default {
   },
   methods: {
     startTraining(settings) {
-      console.log("settings:", settings);
       this.settings = settings;
       this.stage = "questions";
+    },
+    submit(answers) {
+      // TODO actually submit
+      console.log("submitting answers:", answers);
+      this.stage = "congrats";
     },
     reset() {
       this.settings = {};
       this.stage = "options";
+    },
+    restart() {
+      this.stage = "questions";
     },
   },
 };
