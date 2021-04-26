@@ -6,12 +6,14 @@
       <router-link to="/training" :class="getClasses('Training')"
         >Interval training</router-link
       >
-      <button class="btn btn-default">Logout</button>
+      <button class="btn btn-default" @click="logout">Logout</button>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "../utils/axios";
+
 export default {
   name: "NavBar",
   computed: {
@@ -23,6 +25,11 @@ export default {
     getClasses(route) {
       if (this.currentRoute == route) return "btn btn-primary";
       return "btn btn-default";
+    },
+    async logout() {
+      const { data } = await axios.get("/logout");
+      if (!data.success) return this.$emit("error", data.error);
+      this.$emit("logout");
     },
   },
 };

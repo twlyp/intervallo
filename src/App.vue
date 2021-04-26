@@ -21,6 +21,7 @@
       @something="doSomething"
       @error="handleError"
       @login="handleLogin"
+      @logout="handleLogout"
       :user="user"
     />
   </div>
@@ -28,6 +29,8 @@
 
 <script>
 import NavBar from "./components/NavBar";
+
+const ALERT_DELAY = 5000;
 
 export default {
   name: "App",
@@ -43,12 +46,17 @@ export default {
     },
     handleError(err) {
       this.errorMsg = err;
-      setTimeout(() => this.clearMsg(), 5000);
+      setTimeout(() => this.clearMsg(), ALERT_DELAY);
     },
     handleLogin(userData) {
       this.user = { ...userData };
       this.successMsg = "Login successful.";
-      setTimeout(() => this.clearMsg(), 5000);
+      setTimeout(() => this.clearMsg(), ALERT_DELAY);
+    },
+    handleLogout() {
+      this.user = {};
+      this.successMsg = "Logout successful.";
+      setTimeout(() => this.clearMsg(), ALERT_DELAY);
     },
     clearMsg() {
       this.errorMsg = "";

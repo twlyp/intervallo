@@ -55,6 +55,13 @@ export default {
       step: 1,
     };
   },
+  async beforeMount() {
+    // get profile if login cookies already present
+    if (!this.user.id) {
+      const { data } = await axios.get("/profile");
+      if (data.success) return this.$emit("login", data.user);
+    }
+  },
   methods: {
     async send() {
       const destination = this.step === 1 ? "/login" : "/otp";

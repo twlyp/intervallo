@@ -27,4 +27,23 @@ router.post("/otp", async (req, res, next) => {
   return res.json({ success: true, user });
 });
 
+router.get("/profile", async (req, res) => {
+  // if already logged in just serve the profile
+  let { userId } = req.session;
+  if (userId) {
+    const user = await db.getUserProfile({ userId });
+    if (!user) {
+      req.session = null;
+      return res.json({ success: false });
+    }
+    return res.json({ success: true, user });
+  }
+  return res.json({ success: false });
+});
+
+router.get("/logout", (req, res) => {
+  req.session = null;
+  return res.json({ success: true });
+});
+
 module.exports = router;

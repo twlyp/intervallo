@@ -17,18 +17,19 @@ async function getUserId({ email }) {
   return null;
 }
 
-// function getUserProfile({ userId }) {
-//   const [user] = sql`
-//     SELECT name, email, answers
-//     FROM users
-//     WHERE id=${userId}`;
-//   if (!user) return null;
-//   user.answers = JSON.parse(user.answers);
-//   return user;
-// }
+async function getUserProfile({ userId }) {
+  const [user] = await sql`
+    SELECT id, name, email, answers
+    FROM users
+    WHERE id = ${userId}`;
+  console.log("userId:", userId);
+  if (!user) return null;
+  user.answers = JSON.parse(user.answers);
+  return user;
+}
 
-function addOtp({ userId, otp }) {
-  return sql`
+async function addOtp({ userId, otp }) {
+  return await sql`
     INSERT INTO otps (userid, otp)
     VALUES (${userId}, ${otp})
   `;
@@ -48,4 +49,4 @@ async function checkOtp({ email }) {
   return null;
 }
 
-module.exports = { getUserId, addOtp, checkOtp };
+module.exports = { getUserId, addOtp, checkOtp, getUserProfile };

@@ -41,7 +41,7 @@ export default {
     async startTraining(settings) {
       this.settings = settings;
       if (this.user.id) {
-        const { data } = await axios.post("/questions", settings);
+        const { data } = await axios.post("/questions", { settings });
         if (!data.success) return this.$emit("error", data.error);
         this.questions = data.questions;
       }
