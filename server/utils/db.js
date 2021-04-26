@@ -1,7 +1,7 @@
 const postgres = require("postgres"),
   sql = postgres("postgres://leo@localhost/intervallo");
 
-async function getUser({ email }) {
+async function getUserId({ email }) {
   let rows = await sql`
     SELECT id 
     FROM users 
@@ -17,6 +17,16 @@ async function getUser({ email }) {
   return null;
 }
 
+// function getUserProfile({ userId }) {
+//   const [user] = sql`
+//     SELECT name, email, answers
+//     FROM users
+//     WHERE id=${userId}`;
+//   if (!user) return null;
+//   user.answers = JSON.parse(user.answers);
+//   return user;
+// }
+
 function addOtp({ userId, otp }) {
   return sql`
     INSERT INTO otps (userid, otp)
@@ -24,9 +34,9 @@ function addOtp({ userId, otp }) {
   `;
 }
 
-async function getOtp({ email }) {
+async function checkOtp({ email }) {
   const rows = await sql`
-    SELECT users.id, otps.otp
+    SELECT users.id, users.email, users.name, otps.otp
     FROM otps
     INNER JOIN users
       ON users.id = otps.userid
@@ -38,4 +48,4 @@ async function getOtp({ email }) {
   return null;
 }
 
-module.exports = { getUser, addOtp, getOtp };
+module.exports = { getUserId, addOtp, checkOtp };

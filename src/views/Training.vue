@@ -7,6 +7,7 @@
     <training-questions
       v-if="stage === 'questions'"
       :settings="settings"
+      :questions="questions"
       @reset="reset"
       @training-done="submit"
     />
@@ -22,16 +23,28 @@
 import TrainingOptions from "../components/TrainingOptions";
 import TrainingQuestions from "../components/TrainingQuestions";
 import TrainingCongrats from "../components/TrainingCongrats";
+import axios from "../utils/axios";
 
 export default {
   name: "Training",
   components: { TrainingOptions, TrainingQuestions, TrainingCongrats },
+  props: ["user"],
   data() {
-    return { sessionAnswers: [], stage: "options", settings: {} };
+    return {
+      sessionAnswers: [],
+      stage: "options",
+      settings: {},
+      questions: [],
+    };
   },
   methods: {
-    startTraining(settings) {
+    async startTraining(settings) {
       this.settings = settings;
+      if (this.user.id) {
+        const { data } = await axios.post("/questions", settings);
+        if (!data.success) return this.$emit("error", data.error);
+        this.questions = data.questions;
+      }
       this.stage = "questions";
     },
     submit(answers) {
