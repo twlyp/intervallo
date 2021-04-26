@@ -5,11 +5,26 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "mocha './server/**/*.test.js'"
   },
   "dependencies": {
+    "aws-sdk": "*",
     "bootstrap-vue": "^2.17.3",
+    "chai": "*",
+    "chai-http": "*",
+    "compression": "*",
+    "cookie-session": "*",
     "core-js": "^3.6.5",
+    "crypto-random-string": "^3.0.1",
+    "csurf": "*",
+    "express": "*",
+    "mocha": "*",
+    "morgan": "*",
+    "path": "*",
+    "postgres": "*",
+    "referee-sinon": "*",
+    "sinon": "*",
     "tone": "*",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0"
