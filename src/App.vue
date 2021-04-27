@@ -1,10 +1,10 @@
 <template>
   <div id="app">
-    <b-alert :show="Boolean(successMsg)" variant="success" dismissible fade>
+    <b-alert :show="!!successMsg" variant="success" dismissible fade>
       {{ successMsg }}
     </b-alert>
 
-    <b-alert :show="Boolean(errorMsg)" variant="danger" dismissible fade>
+    <b-alert :show="!!errorMsg" variant="danger" dismissible fade>
       {{ errorMsg }}
     </b-alert>
 

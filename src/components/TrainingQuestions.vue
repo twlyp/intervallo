@@ -1,22 +1,38 @@
 <template>
-  <div id="training-questions" class="container-fluid">
+  <div class="training-questions">
     <h4>Question {{ step }}/{{ settings.nQuestions }}</h4>
-    <div class="row">
-      <div
-        class="col-sm-4"
-        v-for="(interval, idx) of settings.intervals"
-        :key="idx"
-      >
-        <button class="btn btn-default" @click="answer(interval.name)">
-          {{ interval.label }}
-        </button>
-      </div>
-    </div>
-    <div class="btn-group">
-      <button class="btn btn-primary" @click="play">Play</button>
-      <button class="btn btn-default" @click="$emit('reset')">Reset</button>
-      <button class="btn btn-default" @click="stop">Stop</button>
-    </div>
+    <b-container fluid>
+      <b-row>
+        <b-col
+          cols="6"
+          v-for="(interval, idx) of settings.intervals"
+          :key="idx"
+        >
+          <b-button
+            pill
+            :variant="
+              selectedButton == interval.name ? 'primary' : 'outline-primary'
+            "
+            @click="answer(interval.name)"
+          >
+            {{ interval.label }}
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+
+    <b-button-group>
+      <b-button variant="outline-primary" @click="play">
+        Replay sound
+      </b-button>
+      <b-button variant="outline-primary" @click="stop"> Stop </b-button>
+    </b-button-group>
+
+    <b-button-group>
+      <b-button variant="outline-primary"> Restart session </b-button>
+      <b-button variant="outline-primary"> Change settings </b-button>
+      <b-button variant="outline-primary"> Abandon session </b-button>
+    </b-button-group>
   </div>
 </template>
 
@@ -52,6 +68,7 @@ export default {
       currentInterval: [],
       sequence: null,
       answers: [],
+      selectedButton: "",
     };
   },
   computed: {
@@ -59,12 +76,15 @@ export default {
       return this.questions[this.step - 1];
     },
   },
+
   created() {
     this.getQuestions();
   },
-  beforeMount() {
+  async beforeMount() {
+    // init
     const interval = this.getInterval();
     this.sequence = createSequence(interval);
+    await Tone.start();
   },
   mounted() {
     this.play();
@@ -72,29 +92,37 @@ export default {
 
   methods: {
     async play() {
-      await Tone.start();
-      // console.log("audio ready");
-      Tone.Transport.start().stop("+2n");
+      return Tone.Transport.start().stop("+2n");
     },
     stop() {
       Tone.Transport.stop();
     },
-    answer(answer) {
+
+    async answer(answer) {
+      this.selectedButton = answer;
+      const answeredInterval = this.getAnsweredInterval(answer);
+      this.updateSequence(answeredInterval);
+      await this.play();
+      this.selectedButton = "";
+
       const { name, direction } = this.currentQuestion;
       this.answers.push({ name, direction, answer });
       console.log(`answered ${answer}`);
+
       if (this.step === this.settings.nQuestions)
         return this.$emit("training-done", this.answers);
       this.step++;
+
       const newInterval = this.getInterval();
       this.updateSequence(newInterval);
       this.play();
     },
+
     getQuestions() {
-      if (this.receivedQuestions) {
+      if (this.receivedQuestions.length != 0) {
         this.questions = this.receivedQuestions;
         this.questions.forEach((el) => {
-          const [intervalData] = INTERVALS.filter((i) => i.name == el.name);
+          const intervalData = INTERVALS.find((i) => i.name == el.name);
           el.semitones = intervalData.semitones;
         });
       } else {
@@ -113,14 +141,20 @@ export default {
       this.currentInterval = interval;
       return interval;
     },
+    getAnsweredInterval(interval) {
+      const { semitones } = INTERVALS.find((i) => i.name == interval);
+      const noteA = this.currentInterval[0];
+      const noteB = noteA.transpose(this.currentQuestion.direction * semitones);
+      return [noteA, noteB];
+    },
     getRandomNote() {
       const freqs = this.settings.range.map((el) =>
         Math.round(Tone.Frequency(el).toFrequency())
       );
       return Tone.Frequency(randomInt(...freqs));
     },
-    updateSequence(interval) {
-      this.sequence.events = interval;
+    updateSequence(array) {
+      this.sequence.events = array;
     },
   },
 };

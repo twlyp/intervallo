@@ -1,8 +1,11 @@
 <template>
-  <div id="interval-training">
+  <div class="training-component">
     <training-options
       v-if="stage === 'options'"
-      @training-settings="startTraining($event)"
+      :receivedSettings="settings"
+      :userId="user.id"
+      @start-magic="getQuestions($event)"
+      @start-random="startTraining($event)"
     />
     <training-questions
       v-if="stage === 'questions'"
@@ -37,12 +40,17 @@ export default {
     };
   },
   methods: {
-    async startTraining(settings) {
+    startTraining(settings) {
       this.settings = settings;
-      if (this.user.id) {
-        const { data } = await axios.post("/questions", { settings });
-        if (!data.success) return this.$emit("error", data.error);
+      this.stage = "questions";
+    },
+    async getQuestions(settings) {
+      this.settings = settings;
+      const { data } = await axios.post("/questions", { settings });
+      if (data.success) {
         this.questions = data.questions;
+      } else {
+        this.$emit("error", data.error);
       }
       this.stage = "questions";
     },

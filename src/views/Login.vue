@@ -28,11 +28,12 @@
         <b-button
           :variant="email ? 'primary-outline' : 'primary'"
           @click="getOtp"
-          >Request OTP</b-button
         >
-        <b-button v-if="step == 2" variant="primary" @click="login"
-          >Login</b-button
-        >
+          Request OTP
+        </b-button>
+        <b-button v-if="step == 2" variant="primary" @click="login">
+          Login
+        </b-button>
       </b-button-group>
     </div>
   </div>

@@ -1,93 +1,80 @@
 <template>
-  <div id="training-options" class="container-fluid">
-    <h4 class="text-center">Intervals</h4>
-    <div class="row">
-      <div class="col-sm-3" v-for="(interval, index) in INTERVALS" :key="index">
-        <div class="form-check">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            :id="interval.name"
-            v-model="selected[interval.name]"
-          />
-          <label class="form-check-label" :for="interval.name">{{
-            interval.label
-          }}</label>
-        </div>
-      </div>
-    </div>
+  <div class="training-options">
+    <b-container fluid>
+      <section>
+        <b-row>
+          <b-col cols="12">
+            <h4>Intervals</h4>
+          </b-col>
+        </b-row>
 
-    <h4 class="text-center">Direction</h4>
-    <div class="row">
-      <div class="col-sm-4">
-        <div class="form-check">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            id="up"
-            aria-describedby="ascending interval"
-            v-model="directions.up"
-          />
-          <label class="form-check-label" for="up">ascending</label>
-        </div>
-      </div>
+        <b-row class="text-left">
+          <b-col cols="6" v-for="(interval, index) in INTERVALS" :key="index">
+            <b-form-checkbox
+              v-model="selected[interval.name]"
+              :name="interval.name"
+            >
+              {{ interval.label }}
+            </b-form-checkbox>
+          </b-col>
+        </b-row>
+      </section>
 
-      <div class="col-sm-4">
-        <div class="form-check">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            id="down"
-            aria-describedby="descending interval"
-            v-model="directions.down"
-          />
-          <label class="form-check-label" for="down">descending</label>
-        </div>
-      </div>
-    </div>
+      <section>
+        <b-row>
+          <b-col cols="12">
+            <h4>Directions</h4>
+          </b-col>
+        </b-row>
 
-    <!-- <div class="col-sm-4">
-        <div class="form-check">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            id="together"
-            aria-describedby="harmonic interval"
-            v-model="direction.together"
-          />
-          <label class="form-check-label" for="together">harmonic</label>
-        </div>
-      </div> -->
+        <b-row class="text-left">
+          <b-col cols="6">
+            <b-form-checkbox v-model="directions.up">
+              ascending
+            </b-form-checkbox>
+          </b-col>
 
-    <div class="row">
-      <div class="col-sm-8">
-        <h4>Number of questions</h4>
-      </div>
-      <div class="col-sm-4">
-        <input
-          type="text"
-          class="form-control"
-          aria-describedby="total number of questions"
-          v-model="nQuestions"
-        />
-      </div>
-    </div>
+          <b-col cols="6">
+            <b-form-checkbox v-model="directions.down">
+              descending
+            </b-form-checkbox>
+          </b-col>
+        </b-row>
+      </section>
 
-    <div class="row">
-      <div class="col-sm-6">
-        <button
-          class="btn btn-primary"
-          @click="$emit('training-settings', configs)"
-        >
-          Start
-        </button>
-      </div>
-      <div class="col-sm-6">
-        <button class="btn btn-default" @click="setDefaults">
-          Set defaults
-        </button>
-      </div>
-    </div>
+      <section id="n-questions">
+        <b-row align-v="center">
+          <b-col cols="8">
+            <h4>Number of questions</h4>
+          </b-col>
+
+          <b-col cols="4">
+            <b-form-input type="number" v-model="nQuestions" min="5" max="20" />
+          </b-col>
+        </b-row>
+      </section>
+    </b-container>
+
+    <b-button-group>
+      <b-button
+        variant="primary"
+        :disabled="!userId"
+        @click="$emit('start-magic', configs)"
+      >
+        Start automagical session
+      </b-button>
+
+      <b-button
+        variant="outline-primary"
+        @click="$emit('start-random', configs)"
+      >
+        Start random session
+      </b-button>
+
+      <b-button variant="outline-primary" @click="setDefaults">
+        Reset defaults
+      </b-button>
+    </b-button-group>
   </div>
 </template>
 
@@ -96,6 +83,8 @@ import { INTERVALS } from "../constants";
 
 export default {
   name: "TrainingOptions",
+
+  props: ["receivedSettings", "userId"],
   data() {
     return {
       INTERVALS,
@@ -109,19 +98,30 @@ export default {
       const intervals = [];
       const directions = [];
       const range = ["A2", "E5"]; // TODO implement range selection
-      // for (let i in this.selected) this.selected[i] && intervals.push(i);
+
+      // if interval i is selected push it to the intervals array
       for (let i of this.INTERVALS) this.selected[i.name] && intervals.push(i);
-      // for (let d in this.directions) this.directions[d] && directions.push(d);
+
       if (this.directions.up) directions.push(+1);
       if (this.directions.down) directions.push(-1);
 
       return { intervals, directions, nQuestions: this.nQuestions, range };
     },
   },
+
   mounted() {
-    this.setDefaults();
+    const { intervals, directions } = this.receivedSettings;
+    if (intervals && directions) {
+      // if settings have been received from Training import them
+      intervals.forEach((i) => (this.selected[i] = true));
+      if (directions.includes("+1")) this.directions.up = true;
+      if (directions.includes("-1")) this.directions.down = true;
+    } else {
+      this.setDefaults();
+    }
     // this.$emit("training-settings", this.configs); // !DEBUG
   },
+
   methods: {
     setDefaults() {
       const intervals = ["M2", "m3", "M3", "P5", "P8"];
@@ -134,7 +134,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// #training-options {
-// max-width: 600px;
-// }
+section {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border: 1px solid #33333333;
+  border-radius: 1em;
+}
+
+h4 {
+  text-align: left;
+}
+
+#n-questions h4 {
+  margin-bottom: 0;
+}
 </style>
