@@ -69,6 +69,10 @@ export default {
 </script>
 
 <style lang="scss">
+body {
+  overflow-x: hidden;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -76,6 +80,7 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
+
 main {
   width: min(100vw, 720px);
   position: absolute;
@@ -84,17 +89,4 @@ main {
   left: 50%;
   transform: translateX(-50%);
 }
-
-// #nav {
-//   padding: 30px;
-
-//   a {
-//     font-weight: bold;
-//     color: #2c3e50;
-
-//     &.router-link-exact-active {
-//       color: #42b983;
-//     }
-//   }
-// }
 </style>
