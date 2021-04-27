@@ -7,7 +7,7 @@
     <training-questions
       v-if="stage === 'questions'"
       :settings="settings"
-      :questions="questions"
+      :receivedQuestions="questions"
       @reset="reset"
       @training-done="submit"
     />
@@ -47,9 +47,15 @@ export default {
       }
       this.stage = "questions";
     },
-    submit(answers) {
+    async submit(answers) {
       // TODO actually submit
-      console.log("submitting answers:", answers);
+      if (this.user.id) {
+        console.log("submitting answers:", answers);
+        const { data } = await axios.post("/answers", { answers });
+        if (!data.success) return this.$emit("error", data.error);
+      } else {
+        console.log("not logged in. answers:", answers);
+      }
       this.stage = "congrats";
     },
     reset() {

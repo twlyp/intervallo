@@ -7,12 +7,11 @@
           <input
             type="checkbox"
             class="form-check-input"
-            :id="interval.label"
-            :aria-describedby="`${interval.name} interval`"
-            v-model="selected[interval.label]"
+            :id="interval.name"
+            v-model="selected[interval.name]"
           />
-          <label class="form-check-label" :for="interval.label">{{
-            interval.name
+          <label class="form-check-label" :for="interval.name">{{
+            interval.label
           }}</label>
         </div>
       </div>
@@ -111,7 +110,7 @@ export default {
       const directions = [];
       const range = ["A2", "E5"]; // TODO implement range selection
       // for (let i in this.selected) this.selected[i] && intervals.push(i);
-      for (let i of this.INTERVALS) this.selected[i.label] && intervals.push(i);
+      for (let i of this.INTERVALS) this.selected[i.name] && intervals.push(i);
       // for (let d in this.directions) this.directions[d] && directions.push(d);
       if (this.directions.up) directions.push(+1);
       if (this.directions.down) directions.push(-1);

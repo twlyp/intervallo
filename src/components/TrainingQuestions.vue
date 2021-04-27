@@ -7,8 +7,8 @@
         v-for="(interval, idx) of settings.intervals"
         :key="idx"
       >
-        <button class="btn btn-default" @click="answer(interval.label)">
-          {{ interval.name }}
+        <button class="btn btn-default" @click="answer(interval.name)">
+          {{ interval.label }}
         </button>
       </div>
     </div>
@@ -22,7 +22,7 @@
 
 <script>
 import * as Tone from "tone";
-// import { INTERVALS } from "../constants";
+import { INTERVALS } from "../constants";
 
 const randomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
@@ -44,7 +44,7 @@ const createSequence = (events) => {
 export default {
   name: "TrainingQuestions",
 
-  props: ["settings"],
+  props: ["settings", "receivedQuestions"],
   data() {
     return {
       step: 1,
@@ -80,8 +80,8 @@ export default {
       Tone.Transport.stop();
     },
     answer(answer) {
-      const { label, direction } = this.currentQuestion;
-      this.answers.push({ question: label, direction, answer });
+      const { name, direction } = this.currentQuestion;
+      this.answers.push({ name, direction, answer });
       console.log(`answered ${answer}`);
       if (this.step === this.settings.nQuestions)
         return this.$emit("training-done", this.answers);
@@ -91,10 +91,18 @@ export default {
       this.play();
     },
     getQuestions() {
-      for (let i = 0; i < this.settings.nQuestions; i++) {
-        const interval = randomElement(this.settings.intervals);
-        interval.direction = randomElement(this.settings.directions);
-        this.questions.push(interval);
+      if (this.receivedQuestions) {
+        this.questions = this.receivedQuestions;
+        this.questions.forEach((el) => {
+          const [intervalData] = INTERVALS.filter((i) => i.name == el.name);
+          el.semitones = intervalData.semitones;
+        });
+      } else {
+        for (let i = 0; i < this.settings.nQuestions; i++) {
+          const interval = randomElement(this.settings.intervals);
+          interval.direction = randomElement(this.settings.directions);
+          this.questions.push(interval);
+        }
       }
     },
     getInterval() {

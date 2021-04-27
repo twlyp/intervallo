@@ -5,6 +5,8 @@ const express = require("express"),
   morgan = require("morgan"),
   compression = require("compression");
 
+const { errorHandler } = require("./routes/middleware");
+
 const app = express();
 
 app.use(
@@ -35,19 +37,7 @@ app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "..", "dist", "index.html"));
 });
 
-app.use((err, req, res, next) => {
-  const ERRORS = {
-    no_user: "Couldn't create user.",
-    bad_otp: "Wrong OTP.",
-    no_login: "Please log in to use smart training generation.",
-  };
-
-  if (err.myError)
-    return res.json({ success: false, error: ERRORS[err.myError] });
-  // console.error(err.stack);
-  // return res.json({ success: false, error: err.message });
-  return next(err);
-});
+app.use(errorHandler);
 
 app.listen(process.env.PORT || 3000, () => console.log("listening..."));
 

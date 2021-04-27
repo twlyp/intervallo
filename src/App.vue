@@ -16,12 +16,11 @@
     >
       {{ errorMsg }}
     </div>
-    <nav-bar />
+    <nav-bar @logout="handleLogout" />
     <router-view
       @something="doSomething"
       @error="handleError"
       @login="handleLogin"
-      @logout="handleLogout"
       :user="user"
     />
   </div>
