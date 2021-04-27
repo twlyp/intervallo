@@ -32,6 +32,7 @@ app.use(
 
 app.use(require("./routes/auth"));
 app.use(require("./routes/questions"));
+app.use(require("./routes/answers"));
 
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "..", "dist", "index.html"));

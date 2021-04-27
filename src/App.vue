@@ -1,58 +1,61 @@
 <template>
   <div id="app">
-    <div
-      v-if="successMsg"
-      class="alert alert-success"
-      role="alert"
-      @click="clearMsg"
-    >
+    <b-alert :show="Boolean(successMsg)" variant="success" dismissible fade>
       {{ successMsg }}
-    </div>
-    <div
-      v-if="errorMsg"
-      class="alert alert-danger"
-      role="alert"
-      @click="clearMsg"
-    >
+    </b-alert>
+
+    <b-alert :show="Boolean(errorMsg)" variant="danger" dismissible fade>
       {{ errorMsg }}
-    </div>
-    <nav-bar @logout="handleLogout" />
-    <router-view
-      @something="doSomething"
-      @error="handleError"
-      @login="handleLogin"
-      :user="user"
-    />
+    </b-alert>
+
+    <main>
+      <b-card title="Card title" no-body>
+        <b-card-header header-tag="nav">
+          <b-nav card-header tabs fill>
+            <b-nav-item to="/" exact exact-active-class="active"
+              >Home</b-nav-item
+            >
+            <b-nav-item to="/login" exact exact-active-class="active"
+              >Login</b-nav-item
+            >
+            <b-nav-item to="/training" exact exact-active-class="active"
+              >Interval training</b-nav-item
+            >
+            <b-nav-item @click="onLogout" :disabled="!user.id"
+              >Logout</b-nav-item
+            >
+          </b-nav>
+        </b-card-header>
+
+        <b-card-body class="text-center">
+          <router-view @error="onError" @login="onLogin" :user="user" />
+        </b-card-body>
+      </b-card>
+    </main>
   </div>
 </template>
 
 <script>
-import NavBar from "./components/NavBar";
-
 const ALERT_DELAY = 5000;
 
 export default {
   name: "App",
-  components: {
-    NavBar,
-  },
+
   data() {
     return { successMsg: "", errorMsg: "", user: {} };
   },
+
   methods: {
-    doSomething() {
-      console.log("doing something");
-    },
-    handleError(err) {
+    onError(err) {
       this.errorMsg = err;
       setTimeout(() => this.clearMsg(), ALERT_DELAY);
     },
-    handleLogin(userData) {
+    onLogin(userData) {
       this.user = { ...userData };
       this.successMsg = "Login successful.";
       setTimeout(() => this.clearMsg(), ALERT_DELAY);
     },
-    handleLogout() {
+    onLogout() {
       this.user = {};
       this.successMsg = "Logout successful.";
       setTimeout(() => this.clearMsg(), ALERT_DELAY);
@@ -72,6 +75,14 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+main {
+  width: min(100vw, 720px);
+  position: absolute;
+  padding: 1rem;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 // #nav {

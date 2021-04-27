@@ -31,7 +31,6 @@ export default {
   props: ["user"],
   data() {
     return {
-      sessionAnswers: [],
       stage: "options",
       settings: {},
       questions: [],
@@ -48,7 +47,6 @@ export default {
       this.stage = "questions";
     },
     async submit(answers) {
-      // TODO actually submit
       if (this.user.id) {
         console.log("submitting answers:", answers);
         const { data } = await axios.post("/answers", { answers });

@@ -49,4 +49,12 @@ async function checkOtp({ email }) {
   return null;
 }
 
-module.exports = { getUserId, addOtp, checkOtp, getUserProfile };
+async function writeAnswers({ userId, answers }) {
+  return await sql`
+    UPDATE users
+    SET answers = ${JSON.stringify(answers)}
+    WHERE id = ${userId}
+    `;
+}
+
+module.exports = { getUserId, addOtp, checkOtp, getUserProfile, writeAnswers };

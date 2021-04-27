@@ -5,8 +5,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build-dev": "vue-cli-service build --mode development",
     "lint": "vue-cli-service lint",
-    "test": "mocha './tests/**/*.test.js'"
+    "test": "mocha './tests/**/*.test.js'",
+    "server": "nodemon './server/server.js'"
   },
   "dependencies": {
     "aws-sdk": "*",
