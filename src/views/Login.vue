@@ -1,16 +1,21 @@
 <template>
   <div class="login-component">
     <div v-if="user.id">
-      <h2>Logged in as {{ user.name || user.email }}.</h2>
+      <div class="header">
+        <h2>Logged in as {{ user.name || user.email }}.</h2>
+      </div>
       <b-button to="/training" variant="primary">Go train!</b-button>
     </div>
 
     <div v-else>
-      <h2>Login or register</h2>
-      <p>
-        An account will be created if you don't have one already. Once you have
-        an account we will be able to generate your training plan.
-      </p>
+      <div class="header">
+        <h2>Login or register</h2>
+        <p>
+          An account will be created if you don't have one already. Once you
+          have an account we will be able to generate your training plan.
+        </p>
+      </div>
+
       <b-form-group
         v-if="step == 1"
         description="We will only use your e-mail address to send you a one-time password (OTP)."
@@ -26,7 +31,7 @@
       </b-form-group>
       <b-button-group>
         <b-button
-          :variant="email ? 'primary-outline' : 'primary'"
+          :variant="step == 2 ? 'outline-primary' : 'primary'"
           @click="getOtp"
         >
           Request OTP

@@ -7,13 +7,6 @@
       @start-magic="onStartMagic($event)"
       @start-random="onStartRandom($event)"
     />
-
-    <training-rehearsal
-      v-if="stage === 'rehearsal'"
-      :settings="settings"
-      @rehearsal-done="onRehearsalDone"
-    />
-
     <training-questions
       v-if="stage === 'questions'"
       :settings="settings"
@@ -22,7 +15,6 @@
       @change-settings="onChangeSettings"
       @training-done="onTrainingDone($event)"
     />
-
     <training-congrats
       v-if="stage === 'congrats'"
       @restart-training="onRestartTraining"
@@ -35,17 +27,11 @@
 import TrainingOptions from "../components/TrainingOptions";
 import TrainingQuestions from "../components/TrainingQuestions";
 import TrainingCongrats from "../components/TrainingCongrats";
-import TrainingRehearsal from "../components/TrainingRehearsal";
 import axios from "../utils/axios";
 
 export default {
   name: "Training",
-  components: {
-    TrainingOptions,
-    TrainingQuestions,
-    TrainingCongrats,
-    TrainingRehearsal,
-  },
+  components: { TrainingOptions, TrainingQuestions, TrainingCongrats },
   props: ["user"],
   data() {
     return {
@@ -68,23 +54,21 @@ export default {
     async onStartMagic(settings) {
       this.settings = settings;
       if (this.user.id) await this.getQuestions();
-      this.stage = "rehearsal";
+      this.stage = "questions";
     },
     onStartRandom(settings) {
       this.settings = settings;
-      this.stage = "rehearsal";
+      this.stage = "questions";
     },
     async onRestartTraining() {
       console.log("restarting");
-      this.stage = "rehearsal";
+      this.stage = "none";
       if (this.user.id) {
         await this.getQuestions();
       } else {
         this.questions = [];
       }
-    },
-    onRehearsalDone() {
-      this.stage = "questions";
+      this.$nextTick(() => (this.stage = "questions"));
     },
     onChangeSettings() {
       this.stage = "options";

@@ -49,32 +49,38 @@
           </b-col>
 
           <b-col cols="4">
-            <b-form-input type="number" v-model="nQuestions" min="5" max="20" />
+            <b-form-input type="number" v-model="nQuestions" min="1" max="20" />
+          </b-col>
+        </b-row>
+      </section>
+
+      <section>
+        <b-row>
+          <b-col>
+            <b-button-group>
+              <b-button
+                variant="primary"
+                :disabled="!userId"
+                @click="$emit('start-magic', configs)"
+              >
+                Start automagical session
+              </b-button>
+
+              <b-button
+                variant="outline-primary"
+                @click="$emit('start-random', configs)"
+              >
+                Start random session
+              </b-button>
+
+              <b-button variant="outline-primary" @click="setDefaults">
+                Reset defaults
+              </b-button>
+            </b-button-group>
           </b-col>
         </b-row>
       </section>
     </b-container>
-
-    <b-button-group>
-      <b-button
-        variant="primary"
-        :disabled="!userId"
-        @click="$emit('start-magic', configs)"
-      >
-        Start automagical session
-      </b-button>
-
-      <b-button
-        variant="outline-primary"
-        @click="$emit('start-random', configs)"
-      >
-        Start random session
-      </b-button>
-
-      <b-button variant="outline-primary" @click="setDefaults">
-        Reset defaults
-      </b-button>
-    </b-button-group>
   </div>
 </template>
 
@@ -90,7 +96,7 @@ export default {
       INTERVALS,
       selected: {},
       directions: { up: false, down: false },
-      nQuestions: 10,
+      nQuestions: 0,
     };
   },
   computed: {
@@ -110,12 +116,13 @@ export default {
   },
 
   mounted() {
-    const { intervals, directions } = this.receivedSettings;
-    if (intervals && directions) {
+    const { intervals, directions, nQuestions } = this.receivedSettings;
+    if (intervals && directions && nQuestions) {
       // if settings have been received from Training import them
-      intervals.forEach((i) => (this.selected[i] = true));
-      if (directions.includes("+1")) this.directions.up = true;
-      if (directions.includes("-1")) this.directions.down = true;
+      intervals.forEach((i) => (this.selected[i.name] = true));
+      if (directions.includes(1)) this.directions.up = true;
+      if (directions.includes(-1)) this.directions.down = true;
+      this.nQuestions = nQuestions;
     } else {
       this.setDefaults();
     }
@@ -126,8 +133,11 @@ export default {
     setDefaults() {
       const intervals = ["M2", "m3", "M3", "P5", "P8"];
       const directions = ["up", "down"];
+      this.selected = {};
+      this.directions = { up: false, down: false };
       for (let i of intervals) this.selected[i] = true;
       for (let d of directions) this.directions[d] = true;
+      this.nQuestions = 5;
     },
   },
 };

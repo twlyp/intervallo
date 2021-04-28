@@ -1,13 +1,5 @@
 <template>
   <div id="app">
-    <b-alert :show="!!successMsg" variant="success" dismissible fade>
-      {{ successMsg }}
-    </b-alert>
-
-    <b-alert :show="!!errorMsg" variant="danger" dismissible fade>
-      {{ errorMsg }}
-    </b-alert>
-
     <main>
       <b-card title="Card title" no-body>
         <b-card-header header-tag="nav">
@@ -27,11 +19,20 @@
           </b-nav>
         </b-card-header>
 
-        <b-card-body class="text-center">
+        <b-card-body id="card-body" class="text-center">
           <router-view @error="onError" @login="onLogin" :user="user" />
         </b-card-body>
       </b-card>
     </main>
+
+    <!-- alerts -->
+    <b-alert :show="!!successMsg" variant="success" dismissible fade>
+      {{ successMsg }}
+    </b-alert>
+
+    <b-alert :show="!!errorMsg" variant="danger" dismissible fade>
+      {{ errorMsg }}
+    </b-alert>
   </div>
 </template>
 
@@ -79,6 +80,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+
+#card-body {
+  padding: 3rem 1rem;
+}
+
+.header {
+  margin: 1rem;
+}
+
+.buttons {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 main {

@@ -1,11 +1,17 @@
 <template>
   <div id="training-congrats" class="container-fluid">
-    <h4>Well done!!</h4>
-
-    <div class="btn-group">
-      <button class="btn btn-primary" @click="$emit('restart')">Restart</button>
-      <button class="btn btn-default" @click="$emit('reset')">Reset</button>
+    <div class="header">
+      <h4>Well done!!</h4>
     </div>
+
+    <b-button-group class="buttons">
+      <b-button variant="primary" @click="$emit('restart-training')">
+        Restart session
+      </b-button>
+      <b-button variant="outline-secondary" @click="$emit('change-settings')">
+        Change settings
+      </b-button>
+    </b-button-group>
   </div>
 </template>
 

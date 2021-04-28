@@ -1,61 +1,82 @@
 <template>
   <div class="training-questions">
-    <h4>Question {{ step }}/{{ settings.nQuestions }}</h4>
     <b-container fluid>
-      <b-row>
+      <!-- headline -->
+      <b-row class="header">
+        <b-col>
+          <h2>Question {{ step }}/{{ settings.nQuestions }}</h2>
+        </b-col>
+      </b-row>
+
+      <!-- interval buttons -->
+      <b-row class="buttons">
         <b-col
-          cols="6"
+          cols="4"
           v-for="(interval, idx) of settings.intervals"
           :key="idx"
         >
           <b-button
             pill
-            :variant="
-              selectedButton == interval.name ? 'primary' : 'outline-primary'
-            "
-            @click="answer(interval.name)"
+            variant="outline-primary"
+            :id="interval.name"
+            @click="onClick"
+            class="my-1"
           >
             {{ interval.label }}
           </b-button>
         </b-col>
       </b-row>
+
+      <!-- play/stop buttons -->
+      <b-row class="buttons">
+        <b-col>
+          <b-button-group>
+            <b-button variant="outline-primary" @click="play">
+              Replay sound
+            </b-button>
+            <b-button variant="outline-primary" @click="stop"> Stop </b-button>
+          </b-button-group>
+        </b-col>
+      </b-row>
+
+      <!-- session buttons -->
+      <b-row class="buttons">
+        <b-col>
+          <b-button-group>
+            <b-button variant="info" @click="restartSession">
+              Restart session
+            </b-button>
+            <b-button variant="outline-secondary" @click="changeSettings">
+              Change settings
+            </b-button>
+            <b-button variant="outline-danger" @click="endSession">
+              End session
+            </b-button>
+          </b-button-group>
+        </b-col>
+      </b-row>
     </b-container>
-
-    <b-button-group>
-      <b-button variant="outline-primary" @click="play">
-        Replay sound
-      </b-button>
-      <b-button variant="outline-primary" @click="stop"> Stop </b-button>
-    </b-button-group>
-
-    <b-button-group>
-      <b-button variant="outline-primary"> Restart session </b-button>
-      <b-button variant="outline-primary"> Change settings </b-button>
-      <b-button variant="outline-primary"> Abandon session </b-button>
-    </b-button-group>
   </div>
 </template>
 
 <script>
 import * as Tone from "tone";
 import { INTERVALS } from "../constants";
+import { sequence } from "./TrainingRehearsal";
 
 const randomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
 const randomElement = (arr) => arr[randomInt(0, arr.length - 1)];
 
-const createSequence = (events) => {
-  const synth = new Tone.Synth().toDestination();
-  const seq = new Tone.Sequence(
-    (time, event) => synth.triggerAttackRelease(event, "8n", time),
-    events,
-    "4n"
-  );
-  seq.loop = false;
-  seq.start(0);
-  return seq;
-};
+// const synth = new Tone.Synth().toDestination();
+// const sequence = new Tone.Sequence(
+//   (time, event) => synth.triggerAttackRelease(event, "8n", time),
+//   [],
+//   "4n"
+// );
+// sequence.loop = false;
+// sequence.start(0);
 
 export default {
   name: "TrainingQuestions",
@@ -66,7 +87,6 @@ export default {
       step: 1,
       questions: [],
       currentInterval: [],
-      sequence: null,
       answers: [],
       selectedButton: "",
     };
@@ -77,49 +97,28 @@ export default {
     },
   },
 
-  created() {
+  beforeMount() {
     this.getQuestions();
   },
-  async beforeMount() {
-    // init
+
+  async mounted() {
     const interval = this.getInterval();
-    this.sequence = createSequence(interval);
+    sequence.events = interval;
     await Tone.start();
-  },
-  mounted() {
     this.play();
   },
 
   methods: {
-    async play() {
-      return Tone.Transport.start().stop("+2n");
+    play() {
+      Tone.Transport.stop();
+      Tone.Transport.start();
     },
     stop() {
       Tone.Transport.stop();
     },
 
-    async answer(answer) {
-      this.selectedButton = answer;
-      const answeredInterval = this.getAnsweredInterval(answer);
-      this.updateSequence(answeredInterval);
-      await this.play();
-      this.selectedButton = "";
-
-      const { name, direction } = this.currentQuestion;
-      this.answers.push({ name, direction, answer });
-      console.log(`answered ${answer}`);
-
-      if (this.step === this.settings.nQuestions)
-        return this.$emit("training-done", this.answers);
-      this.step++;
-
-      const newInterval = this.getInterval();
-      this.updateSequence(newInterval);
-      this.play();
-    },
-
     getQuestions() {
-      if (this.receivedQuestions.length != 0) {
+      if (this.receivedQuestions.length > 0) {
         this.questions = this.receivedQuestions;
         this.questions.forEach((el) => {
           const intervalData = INTERVALS.find((i) => i.name == el.name);
@@ -153,9 +152,46 @@ export default {
       );
       return Tone.Frequency(randomInt(...freqs));
     },
-    updateSequence(array) {
-      this.sequence.events = array;
+
+    restartSession() {
+      return this.$emit("restart-training", this.answers);
+    },
+    changeSettings() {
+      return this.$emit("change-settings", this.answers);
+    },
+    endSession() {
+      return this.$emit("training-done", this.answers);
+    },
+
+    onClick(e) {
+      const answer = e.target.id;
+      e.target.classList.replace("btn-outline-primary", "btn-primary");
+      const answeredInterval = this.getAnsweredInterval(answer);
+      sequence.events = answeredInterval;
+      this.play();
+      Tone.Transport.scheduleOnce(() => {
+        e.target.classList.replace("btn-primary", "btn-outline-primary");
+        this.answer(answer);
+      }, "+1n");
+    },
+
+    async answer(answer) {
+      const { name, direction } = this.currentQuestion;
+      this.answers.push({ name, direction, answer });
+      console.log(`answered ${answer}`);
+
+      if (this.step === this.settings.nQuestions) {
+        this.endSession();
+      } else {
+        this.step++;
+
+        const newInterval = this.getInterval();
+        sequence.events = newInterval;
+        this.play();
+      }
     },
   },
 };
 </script>
+
+<style lang="scss" scoped></style>

@@ -11,7 +11,7 @@ router.post("/login", async (req, res, next) => {
   try {
     await db.addOtp({ userId, otp });
     // !DEBUG await ses.sendEmail(email, otp, "Your Intervallo login code");
-    console.log("userId, otp:", userId, otp);
+    console.log("otp:", otp);
     return res.json({ success: true });
   } catch (err) {
     return next(err);
@@ -42,8 +42,7 @@ router.get("/profile", async (req, res) => {
 });
 
 router.get("/logout", (req, res) => {
-  req.session = null;
-  return res.json({ success: true });
+  req.session.destroy(() => res.json({ success: true }));
 });
 
 module.exports = router;
