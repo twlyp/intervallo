@@ -39,21 +39,11 @@
 
 <script>
 import * as Tone from "tone";
+import { sequence } from "../views/Training";
 import { INTERVALS } from "../constants";
 
 const randomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
-
-const synth = new Tone.Synth().toDestination();
-const sequence = new Tone.Sequence(
-  (time, event) => synth.triggerAttackRelease(event, "8n", time),
-  [],
-  "4n"
-);
-sequence.loop = false;
-sequence.start(0);
-
-export { synth, sequence };
 
 export default {
   name: "TrainingRehearsal",

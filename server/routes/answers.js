@@ -10,7 +10,6 @@ router.post("/answers", isLoggedIn, async (req, res, next) => {
     const storedAnswers = await db.getUserProfile({ userId }).then((user) => {
       return user.answers || [];
     });
-    console.log("storedAnswers:", storedAnswers);
     answers.forEach((a) => {
       const isCorrect = a.name == a.answer;
       a.right = isCorrect ? 1 : 0;

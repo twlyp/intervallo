@@ -24,17 +24,6 @@ router.post("/questions", isLoggedIn, async (req, res, next) => {
 });
 
 function generateQuestions(answers, { intervals, directions, nQuestions }) {
-  // function calculateintervalPool(intervals, directions) {
-  //   const result = [];
-  //   directions.forEach((d) => {
-  //     const selected = intervals.map((i) => ({ name: i.name, direction: d }));
-  //     result.push(...selected);
-  //   });
-  //   return result;
-  // }
-
-  // const intervalPool = calculateintervalPool(intervals, directions);
-
   // to create the list of possible intervals:
   // for each possible direction take all possible intervals
   // and map their label together with the direction

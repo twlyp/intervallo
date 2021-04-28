@@ -62,21 +62,12 @@
 <script>
 import * as Tone from "tone";
 import { INTERVALS } from "../constants";
-import { sequence } from "./TrainingRehearsal";
+import { sequence } from "../views/Training";
 
 const randomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
 const randomElement = (arr) => arr[randomInt(0, arr.length - 1)];
-
-// const synth = new Tone.Synth().toDestination();
-// const sequence = new Tone.Sequence(
-//   (time, event) => synth.triggerAttackRelease(event, "8n", time),
-//   [],
-//   "4n"
-// );
-// sequence.loop = false;
-// sequence.start(0);
 
 export default {
   name: "TrainingQuestions",
@@ -180,7 +171,7 @@ export default {
       this.answers.push({ name, direction, answer });
       console.log(`answered ${answer}`);
 
-      if (this.step === this.settings.nQuestions) {
+      if (this.step == this.settings.nQuestions) {
         this.endSession();
       } else {
         this.step++;

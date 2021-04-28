@@ -103,7 +103,7 @@ export default {
     configs() {
       const intervals = [];
       const directions = [];
-      const range = ["A2", "E5"]; // TODO implement range selection
+      const range = ["C3", "C5"]; // TODO implement range selection
 
       // if interval i is selected push it to the intervals array
       for (let i of this.INTERVALS) this.selected[i.name] && intervals.push(i);

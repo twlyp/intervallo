@@ -38,6 +38,19 @@ import TrainingCongrats from "../components/TrainingCongrats";
 import TrainingRehearsal from "../components/TrainingRehearsal";
 import axios from "../utils/axios";
 
+import * as Tone from "tone";
+
+const synth = new Tone.Synth().toDestination();
+const sequence = new Tone.Sequence(
+  (time, event) => synth.triggerAttackRelease(event, "8n", time),
+  [],
+  "4n"
+);
+sequence.loop = false;
+sequence.start(0);
+
+export { synth, sequence };
+
 export default {
   name: "Training",
   components: {
